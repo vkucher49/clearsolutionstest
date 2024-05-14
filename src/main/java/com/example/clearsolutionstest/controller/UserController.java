@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -20,14 +21,19 @@ public class UserController {
         return userService.createUser(userDto);
     }
 
-    @PutMapping("/{email}")
-    public UserDto updateUser(@PathVariable String email, @RequestBody @Valid UserDto userDto) {
-        return userService.updateUser(email, userDto);
+    @PutMapping("/{id}")
+    public UserDto updateUser(@PathVariable Long id, @RequestBody @Valid UserDto userDto) {
+        return userService.updateUser(id, userDto);
     }
 
-    @DeleteMapping("/{email}")
-    public void deleteUser(@PathVariable String email) {
-        userService.deleteUser(email);
+    @PatchMapping("/{id}")
+    public UserDto updateUserFields(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
+        return userService.updateUserFields(id, fields);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 
     @GetMapping
