@@ -13,10 +13,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,6 +38,7 @@ public class UserControllerTests {
     @Test
     void testCreateUser() throws Exception {
         UserDto userDto = new UserDto();
+        userDto.setId(1L);
         userDto.setEmail("test@example.com");
         userDto.setFirstName("Joe");
         userDto.setLastName("Doe");
@@ -50,24 +55,52 @@ public class UserControllerTests {
     @Test
     void testUpdateUser() throws Exception {
         UserDto userDto = new UserDto();
+        userDto.setId(1L);
         userDto.setEmail("test@example.com");
         userDto.setFirstName("Joe");
         userDto.setLastName("Doe");
         userDto.setBirthDate(LocalDate.of(2000, 1, 1));
 
-        when(userService.updateUser(userDto.getEmail(), userDto)).thenReturn(userDto);
+        when(userService.updateUser(userDto.getId(), userDto)).thenReturn(userDto);
 
-        mockMvc.perform(put("/users/" + userDto.getEmail())
+        mockMvc.perform(put("/users/" + userDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void testDeleteUser() throws Exception {
-        String email = "test@example.com";
+    void testUpdateUserFields() throws Exception {
+        Long id = 1L;
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("email", "newemail@example.com");
+        fields.put("firstName", "NewFirstName");
+        fields.put("lastName", "NewLastName");
 
-        mockMvc.perform(delete("/users/" + email))
+        UserDto userDto = new UserDto();
+        userDto.setId(id);
+        userDto.setEmail("newemail@example.com");
+        userDto.setFirstName("NewFirstName");
+        userDto.setLastName("NewLastName");
+
+        when(userService.updateUserFields(id, fields)).thenReturn(userDto);
+
+        mockMvc.perform(patch("/users/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(fields)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(id.intValue())))
+                .andExpect(jsonPath("$.email", is("newemail@example.com")))
+                .andExpect(jsonPath("$.firstName", is("NewFirstName")))
+                .andExpect(jsonPath("$.lastName", is("NewLastName")));
+    }
+
+
+    @Test
+    void testDeleteUser() throws Exception {
+        Long id = 1L;
+
+        mockMvc.perform(delete("/users/" + id))
                 .andExpect(status().isOk());
     }
 

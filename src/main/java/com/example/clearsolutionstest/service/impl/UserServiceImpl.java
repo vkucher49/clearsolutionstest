@@ -18,11 +18,11 @@ public class UserServiceImpl implements UserService {
     @Value("${user.min.age}")
     private int minAge;
 
-    private Map<String, UserDto> users = new HashMap<>();
+    private Map<Long, UserDto> users = new HashMap<>();
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        if (users.containsKey(userDto.getEmail())) {
+        if (users.containsKey(userDto.getId())) {
             throw new IllegalArgumentException("User with this email already exists");
         }
 
@@ -30,26 +30,60 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("User birth date must be at least " + minAge + " years old");
         }
 
-        users.put(userDto.getEmail(), userDto);
+        users.put(userDto.getId(), userDto);
         return userDto;
     }
 
     @Override
-    public UserDto updateUser(String email,UserDto userDto) {
-        if (!users.containsKey(email)) {
+    public UserDto updateUser(Long id,UserDto userDto) {
+        if (!users.containsKey(id)) {
             throw new IllegalArgumentException("User not found");
         }
-        users.put(email, userDto);
+        users.put(id, userDto);
         return userDto;
     }
 
     @Override
-    public void deleteUser(String email) {
-        if (!users.containsKey(email)) {
+    public UserDto updateUserFields(Long id, Map<String, Object> fields) {
+        UserDto userDto = users.get(id);
+        if (userDto == null) {
             throw new IllegalArgumentException("User not found");
         }
 
-        users.remove(email);
+        for (String field : fields.keySet()) {
+            switch (field) {
+                case "email":
+                    userDto.setEmail((String) fields.get(field));
+                    break;
+                case "firstName":
+                    userDto.setFirstName((String) fields.get(field));
+                    break;
+                case "lastName":
+                    userDto.setLastName((String) fields.get(field));
+                    break;
+                case "birthDate":
+                    userDto.setBirthDate(LocalDate.parse((String) fields.get(field)));
+                    break;
+                case "address":
+                    userDto.setAddress((String) fields.get(field));
+                    break;
+                case "phoneNumber":
+                    userDto.setPhoneNumber((String) fields.get(field));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Field " + field + " not found");
+            }
+        }
+        return userDto;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        if (!users.containsKey(id)) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        users.remove(id);
     }
 
     @Override

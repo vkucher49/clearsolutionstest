@@ -10,7 +10,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -42,6 +44,7 @@ public class UserServiceImplTest {
     @Test
     void testUpdateUser() {
         UserDto userDto = new UserDto();
+        userDto.setId(1L);
         userDto.setEmail("test@example.com");
         userDto.setFirstName("Joe");
         userDto.setLastName("Doe");
@@ -49,24 +52,50 @@ public class UserServiceImplTest {
 
         userService.createUser(userDto);
 
-        UserDto updatedUser = userService.updateUser("test@example.com", userDto);
+        UserDto updatedUser = userService.updateUser(userDto.getId(), userDto);
 
         assertEquals("test@example.com", updatedUser.getEmail());
     }
 
     @Test
+    void testUpdateUserFields() {
+        Long id = 1L;
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("email", "newemail@example.com");
+        fields.put("firstName", "NewFirstName");
+        fields.put("lastName", "NewLastName");
+
+        UserDto userDto = new UserDto();
+        userDto.setId(id);
+        userDto.setEmail("newemail@example.com");
+        userDto.setFirstName("NewFirstName");
+        userDto.setLastName("NewLastName");
+        userDto.setBirthDate(LocalDate.of(2000, 1, 1));
+
+        userService.createUser(userDto);
+
+        UserDto updatedUser = userService.updateUserFields(id, fields);
+
+        assertEquals("newemail@example.com", updatedUser.getEmail());
+        assertEquals("NewFirstName", updatedUser.getFirstName());
+        assertEquals("NewLastName", updatedUser.getLastName());
+    }
+
+
+    @Test
     void testDeleteUser() {
         UserDto userDto = new UserDto();
+        userDto.setId(1L);
         userDto.setEmail("test@example.com");
         userDto.setFirstName("Joe");
         userDto.setLastName("Doe");
         userDto.setBirthDate(LocalDate.of(2000, 1, 1));
 
         userService.createUser(userDto);
-        userService.deleteUser("test@example.com");
+        userService.deleteUser(1L);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            userService.updateUser("test@example.com", userDto);
+            userService.updateUser(1L, userDto);
         });
 
         String expectedMessage = "User not found";
