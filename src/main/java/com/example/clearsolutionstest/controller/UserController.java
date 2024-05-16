@@ -27,8 +27,8 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public UserDto updateUserFields(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
-        return userService.updateUserFields(id, fields);
+    public UserDto modifyUserDetails(@PathVariable Long id, @RequestBody UserDto userDto) {
+        return userService.modifyUserDetails(id, userDto);
     }
 
     @DeleteMapping("/{id}")

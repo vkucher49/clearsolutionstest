@@ -70,29 +70,27 @@ public class UserControllerTests {
     }
 
     @Test
-    void testUpdateUserFields() throws Exception {
+    void testModifyUserDetails() throws Exception {
         Long id = 1L;
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("email", "newemail@example.com");
-        fields.put("firstName", "NewFirstName");
-        fields.put("lastName", "NewLastName");
-
         UserDto userDto = new UserDto();
         userDto.setId(id);
         userDto.setEmail("newemail@example.com");
         userDto.setFirstName("NewFirstName");
         userDto.setLastName("NewLastName");
+        userDto.setBirthDate(LocalDate.of(2000,1,1));
 
-        when(userService.updateUserFields(id, fields)).thenReturn(userDto);
+        when(userService.modifyUserDetails(id, userDto)).thenReturn(userDto);
 
         mockMvc.perform(patch("/users/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(fields)))
+                        .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(id.intValue())))
-                .andExpect(jsonPath("$.email", is("newemail@example.com")))
-                .andExpect(jsonPath("$.firstName", is("NewFirstName")))
-                .andExpect(jsonPath("$.lastName", is("NewLastName")));
+                .andExpect(jsonPath("$.email", is(userDto.getEmail())))
+                .andExpect(jsonPath("$.firstName", is(userDto.getFirstName())))
+                .andExpect(jsonPath("$.lastName", is(userDto.getLastName())))
+                .andExpect(jsonPath("$.birthDate", is(userDto.getBirthDate().toString())))
+                .andExpect(jsonPath("$.address", is(userDto.getAddress())))
+                .andExpect(jsonPath("$.phoneNumber", is(userDto.getPhoneNumber())));
     }
 
 

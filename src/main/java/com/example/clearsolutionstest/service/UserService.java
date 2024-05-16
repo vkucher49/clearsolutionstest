@@ -11,7 +11,7 @@ public interface UserService {
 
     UserDto updateUser(Long id,UserDto userDto);
 
-    UserDto updateUserFields(Long id, Map<String, Object> fields);
+    UserDto modifyUserDetails(Long id, UserDto userDto);
 
     void deleteUser(Long id);
 
