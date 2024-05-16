@@ -44,37 +44,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUserFields(Long id, Map<String, Object> fields) {
-        UserDto userDto = users.get(id);
-        if (userDto == null) {
+    public UserDto modifyUserDetails(Long id, UserDto userDto) {
+        UserDto existingUserDto = users.get(id);
+        if (existingUserDto == null) {
             throw new IllegalArgumentException("User not found");
         }
 
-        for (String field : fields.keySet()) {
-            switch (field) {
-                case "email":
-                    userDto.setEmail((String) fields.get(field));
-                    break;
-                case "firstName":
-                    userDto.setFirstName((String) fields.get(field));
-                    break;
-                case "lastName":
-                    userDto.setLastName((String) fields.get(field));
-                    break;
-                case "birthDate":
-                    userDto.setBirthDate(LocalDate.parse((String) fields.get(field)));
-                    break;
-                case "address":
-                    userDto.setAddress((String) fields.get(field));
-                    break;
-                case "phoneNumber":
-                    userDto.setPhoneNumber((String) fields.get(field));
-                    break;
-                default:
-                    throw new IllegalArgumentException("Field " + field + " not found");
-            }
-        }
-        return userDto;
+        existingUserDto.setEmail(userDto.getEmail());
+        existingUserDto.setFirstName(userDto.getFirstName());
+        existingUserDto.setLastName(userDto.getLastName());
+        existingUserDto.setBirthDate(userDto.getBirthDate());
+        existingUserDto.setAddress(userDto.getAddress());
+        existingUserDto.setPhoneNumber(userDto.getPhoneNumber());
+
+        return existingUserDto;
     }
 
     @Override

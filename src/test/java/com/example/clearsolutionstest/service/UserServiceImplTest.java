@@ -58,27 +58,34 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void testUpdateUserFields() {
+    public void testModifyUserDetails() {
         Long id = 1L;
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("email", "newemail@example.com");
-        fields.put("firstName", "NewFirstName");
-        fields.put("lastName", "NewLastName");
+        UserDto existingUser = new UserDto();
+        existingUser.setEmail("oldEmail@example.com");
+        existingUser.setFirstName("OldFirstName");
+        existingUser.setLastName("OldLastName");
+        existingUser.setBirthDate(LocalDate.of(1990, 1, 1));
+        existingUser.setAddress("Old Address");
+        existingUser.setPhoneNumber("1234567890");
 
-        UserDto userDto = new UserDto();
-        userDto.setId(id);
-        userDto.setEmail("newemail@example.com");
-        userDto.setFirstName("NewFirstName");
-        userDto.setLastName("NewLastName");
-        userDto.setBirthDate(LocalDate.of(2000, 1, 1));
+        UserDto newUser = new UserDto();
+        newUser.setId(2L);
+        newUser.setEmail("newEmail@example.com");
+        newUser.setFirstName("NewFirstName");
+        newUser.setLastName("NewLastName");
+        newUser.setBirthDate(LocalDate.of(2000, 1, 1));
+        newUser.setAddress("New Address");
+        newUser.setPhoneNumber("0987654321");
 
-        userService.createUser(userDto);
+        userService.createUser(newUser);
+        UserDto updatedUser = userService.modifyUserDetails(newUser.getId(), newUser);
 
-        UserDto updatedUser = userService.updateUserFields(id, fields);
-
-        assertEquals("newemail@example.com", updatedUser.getEmail());
-        assertEquals("NewFirstName", updatedUser.getFirstName());
-        assertEquals("NewLastName", updatedUser.getLastName());
+        assertEquals(newUser.getEmail(), updatedUser.getEmail());
+        assertEquals(newUser.getFirstName(), updatedUser.getFirstName());
+        assertEquals(newUser.getLastName(), updatedUser.getLastName());
+        assertEquals(newUser.getBirthDate(), updatedUser.getBirthDate());
+        assertEquals(newUser.getAddress(), updatedUser.getAddress());
+        assertEquals(newUser.getPhoneNumber(), updatedUser.getPhoneNumber());
     }
 
 
